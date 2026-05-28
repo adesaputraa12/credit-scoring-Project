@@ -9,5 +9,7 @@ source venv/Scripts/activate --> aktifkan venv
 '''
 
 '''bash
-pip install -r requirements.txt
+pip install -r requirements.txt --> install requirements
 '''
+
+'''bash
