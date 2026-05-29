@@ -1,6 +1,6 @@
-from mlProject.config.configuration import ConfigurationManager
-from mlProject.components.data_ingestion import DataIngestion
-from mlProject.logging import logger
+from src.mlProject.config.configuration import ConfigurationManager
+from src.mlProject.components.data_ingestion import DataIngestion
+from src.mlProject.logging import logger
 
 STAGE_NAME = "Data Ingestion Stage"
 
@@ -19,7 +19,6 @@ class DataIngestionTrainingPipeline:
 
 if __name__ == "__main__":
     try:
-        logger.info(f">>>>> stage {STAGE_NAME} started <<<<<")
         data_ingestion_pipeline = DataIngestionTrainingPipeline()
         data_ingestion_pipeline.main()
         logger.info(f">>>>> stage {STAGE_NAME} completed <<<<<\n\nx==========x")
