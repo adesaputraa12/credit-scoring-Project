@@ -15,22 +15,8 @@
 # How to run?
 ### STEPS:
 
-'''bash
-python -m venv venv --> membuat environment venv
-'''
-
-'''bash
-source venv/Scripts/activate --> aktifkan venv
-'''
-
-'''bash
-pip install -r requirements.txt --> install requirements
-'''
-
-'''bash
-python app.py
-'''
-
-'''bash
-Now open up your local host 0.0.0.0:8080
-'''
+1. python -m venv venv 
+2. source venv/Scripts/activate 
+3. pip install -r requirements.txt
+4. python app.py 
+5. Now open up your local host 0.0.0.0:8080
