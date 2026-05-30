@@ -12,6 +12,9 @@
 8. update the main.py
 9. update the app.py
 
+# How to run?
+### STEPS:
+
 '''bash
 python -m venv venv --> membuat environment venv
 '''
@@ -24,4 +27,10 @@ source venv/Scripts/activate --> aktifkan venv
 pip install -r requirements.txt --> install requirements
 '''
 
+'''bash
+python app.py
+'''
 
+'''bash
+Now open up your local host 0.0.0.0:8080
+'''
