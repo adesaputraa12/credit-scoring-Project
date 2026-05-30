@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wine Quality Prediction</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    
+    :root {
+      --blue-dark:   #1A3C6E;   /* navbar & footer */
+      --blue-mid:    #2563EB;   /* tombol & aksen */
+      --blue-light:  #EEF4FF;   /* background section form */
+      --white:       #FFFFFF;
+      --text-dark:   #0F172A;
+      --text-mid:    #475569;
+      --text-light:  #94A3B8;
+      --border:      #CBD5E1;
+      --radius:      12px;
+      --shadow:      0 4px 24px rgba(37,99,235,0.08);
+    }
+
+    /* =============================================
+       RESET & BASE
+       ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-dark);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* =============================================
+       NAVBAR — ubah teks menu di sini
+       ============================================= */
+    nav {
+      background: var(--blue-dark);
+      padding: 0 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    .nav-logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--white); }
+
+    /* =============================================
+       HERO SECTION — ubah judul & subtitle di sini
+       ============================================= */
+    .hero {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #1e4fa8 60%, #2563EB 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 88px 5% 96px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dekorasi lingkaran samar di background hero */
+    .hero::before,
+    .hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero::before { width: 400px; height: 400px; top: -120px; left: -100px; }
+    .hero::after  { width: 300px; height: 300px; bottom: -80px; right: -60px; }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 460px;
+      margin: 0 auto 36px;
+    }
+
+    /* Tombol scroll ke form */
+    .hero-cta {
+      display: inline-block;
+      background: var(--white);
+      color: var(--blue-mid);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 13px 32px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    }
+
+    /* =============================================
+       FORM SECTION
+       ============================================= */
+    .form-section {
+      background: var(--blue-light);
+      padding: 72px 5%;
+    }
+
+    .form-container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 48px 48px 52px;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .form-header h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+
+    /* Garis dekorasi di bawah judul form */
+    .form-header h2::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 3px;
+      background: var(--blue-mid);
+      margin: 10px auto 0;
+      border-radius: 2px;
+    }
+
+    .form-header p {
+      color: var(--text-mid);
+      font-size: 0.93rem;
+    }
+
+    /* =============================================
+       GRID FORM — 2 kolom desktop, 1 kolom mobile
+       ============================================= */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 28px;
+    }
+
+    /* Field label */
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 7px;
+      letter-spacing: 0.2px;
+    }
+
+    /* Input styling */
+    .field input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem;
+      color: var(--text-dark);
+      background: #F8FAFC;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      outline: none;
+    }
+
+    .field input::placeholder { color: var(--text-light); }
+
+    .field input:focus {
+      border-color: var(--blue-mid);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    /* Hint teks di bawah input */
+    .field .hint {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 5px;
+    }
+
+    /* =============================================
+       TOMBOL PREDICT — ubah teks di sini
+       ============================================= */
+    .btn-wrap {
+      text-align: center;
+      margin-top: 36px;
+    }
+
+    .btn-predict {
+      background: var(--blue-mid);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 52px;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+    }
+
+    .btn-predict:hover {
+      background: #1D4ED8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37,99,235,0.35);
+    }
+
+    .btn-predict:active { transform: translateY(0); }
+
+    /* =============================================
+       RESULT BOX — muncul setelah prediksi
+       (Jinja2: tampilkan jika ada {{ prediction }})
+       ============================================= */
+    .result-box {
+      margin-top: 28px;
+      background: #EEF4FF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    .result-box .result-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--blue-mid);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .result-box .result-value {
+      font-family: 'Sora', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    /* =============================================
+       FOOTER — ubah nama & sosial di sini
+       ============================================= */
+    footer {
+      background: var(--blue-dark);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 32px 5%;
+    }
+
+    .footer-icons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    /* Icon SVG sosial media */
+    .footer-icons a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      color: var(--white);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .footer-icons a:hover {
+      background: var(--blue-mid);
+      transform: translateY(-2px);
+    }
+
+    .footer-icons svg { width: 18px; height: 18px; fill: currentColor; }
+
+    footer p { font-size: 0.82rem; }
+    footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    footer a:hover { color: var(--white); }
+
+    /* =============================================
+       RESPONSIVE — 1 kolom di layar kecil
+       ============================================= */
+    @media (max-width: 640px) {
+      .form-container { padding: 32px 24px 36px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }  /* sembunyikan menu di mobile */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       NAVBAR
+       ============================================ -->
+  <nav>
+    <a href="/" class="nav-logo">🍷 WinePredict</a>
+    <ul class="nav-links">
+      <li><a href="/" class="active">Home</a></li>
+      <li><a href="#form-section">Predict</a></li>
+    </ul>
+  </nav>
+
+
+  <section class="hero">
+    <div class="hero-badge">Machine Learning App</div>
+    <h1>Wine Quality<br>Prediction</h1>
+    <p>A Wine Quality Checking Web App — masukkan data kimia wine dan dapatkan prediksi kualitasnya secara instan.</p>
+    <a href="#form-section" class="hero-cta">Mulai Prediksi →</a>
+  </section>
+
+
+  <section class="form-section" id="form-section">
+    <div class="form-container">
+
+      <div class="form-header">
+        <h2>Please Fill The Information</h2>
+        <p>Isi semua kolom dengan nilai kimia wine yang ingin diprediksi</p>
+      </div>
+
+      <form action="/predict" method="POST" id="predForm">
+        <div class="form-grid">
+
+          <!-- Kolom kiri -->
+          <div class="field">
+            <label for="fixed_acidity">Fixed Acidity</label>
+            <input
+              type="number" step="any"
+              id="fixed_acidity"
+              name="fixed_acidity"
+              placeholder="contoh: 7.4"
+              required
+            />
+            <span class="hint">Keasaman tetap (g/dm³)</span>
+          </div>
+
+          <!-- Kolom kanan -->
+          <div class="field">
+            <label for="volatile_acidity">Volatile Acidity</label>
+            <input
+              type="number" step="any"
+              id="volatile_acidity"
+              name="volatile_acidity"
+              placeholder="contoh: 0.70"
+              required
+            />
+            <span class="hint">Keasaman volatil (g/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="citric_acid">Citric Acid</label>
+            <input
+              type="number" step="any"
+              id="citric_acid"
+              name="citric_acid"
+              placeholder="contoh: 0.00"
+              required
+            />
+            <span class="hint">Asam sitrat (g/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="residual_sugar">Residual Sugar</label>
+            <input
+              type="number" step="any"
+              id="residual_sugar"
+              name="residual_sugar"
+              placeholder="contoh: 1.9"
+              required
+            />
+            <span class="hint">Sisa gula (g/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="chlorides">Chlorides</label>
+            <input
+              type="number" step="any"
+              id="chlorides"
+              name="chlorides"
+              placeholder="contoh: 0.076"
+              required
+            />
+            <span class="hint">Kadar klorida (g/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="free_sulfur_dioxide">Free Sulfur Dioxide</label>
+            <input
+              type="number" step="any"
+              id="free_sulfur_dioxide"
+              name="free_sulfur_dioxide"
+              placeholder="contoh: 11.0"
+              required
+            />
+            <span class="hint">SO₂ bebas (mg/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="total_sulfur_dioxide">Total Sulfur Dioxide</label>
+            <input
+              type="number" step="any"
+              id="total_sulfur_dioxide"
+              name="total_sulfur_dioxide"
+              placeholder="contoh: 34.0"
+              required
+            />
+            <span class="hint">Total SO₂ (mg/dm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="density">Density</label>
+            <input
+              type="number" step="any"
+              id="density"
+              name="density"
+              placeholder="contoh: 0.9978"
+              required
+            />
+            <span class="hint">Kepadatan (g/cm³)</span>
+          </div>
+
+          <div class="field">
+            <label for="pH">pH</label>
+            <input
+              type="number" step="any"
+              id="pH"
+              name="pH"
+              placeholder="contoh: 3.51"
+              required
+            />
+            <span class="hint">Tingkat keasaman (0–14)</span>
+          </div>
+
+          <div class="field">
+            <label for="sulphates">Sulphates</label>
+            <input
+              type="number" step="any"
+              id="sulphates"
+              name="sulphates"
+              placeholder="contoh: 0.56"
+              required
+            />
+            <span class="hint">Sulfat (g/dm³)</span>
+          </div>
+
+          <!-- Alcohol: lebar penuh di mobile, tetap di grid -->
+          <div class="field" style="grid-column: 1 / -1; max-width: calc(50% - 14px);">
+            <label for="alcohol">Alcohol</label>
+            <input
+              type="number" step="any"
+              id="alcohol"
+              name="alcohol"
+              placeholder="contoh: 9.4"
+              required
+            />
+            <span class="hint">Kadar alkohol (%)</span>
+          </div>
+
+        </div><!-- /form-grid -->
+
+        <!-- Tombol Predict -->
+        <div class="btn-wrap">
+          <button type="submit" class="btn-predict">
+            🔍 Predict Quality
+          </button>
+        </div>
+
+        <!--
+          RESULT BOX (Flask/Jinja2):
+          Uncomment blok di bawah dan ganti dengan:
+          {% if prediction is defined %}
+            <div class="result-box">
+              <div class="result-label">Predicted Wine Quality</div>
+              <div class="result-value">{{ prediction }}</div>
+            </div>
+          {% endif %}
+
+          Untuk demo statis, hapus style="display:none" di bawah:
+        -->
+
+        {% if prediction is defined %}
+        <div class="result-box">
+          <div class="result-label">Predicted Wine Quality</div>
+          <div class="result-value">{{ prediction }} / 10</div>
+        </div>
+        {% endif %}
+
+      </form>
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       FOOTER — ubah nama & link sosmed di sini
+       ============================================ -->
+  <footer>
+    <div class="footer-icons">
+      <!-- LinkedIn -->
+      <a href="#" title="LinkedIn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.44-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.22 0z"/></svg>
+      </a>
+      <!-- YouTube -->
+      <a href="#" title="YouTube" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.81zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z"/></svg>
+      </a>
+      <!-- GitHub -->
+      <a href="#" title="GitHub" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.01 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/></svg>
+      </a>
+    </div>
+    <p>© Wine Quality Prediction &nbsp;·&nbsp; <a href="#">ML Project Series</a></p>
+  </footer>
+
+
+  <!-- ============================================
+       JAVASCRIPT — hanya untuk smooth scroll
+       & demo result box (hapus jika pakai Flask)
+       ============================================ -->
+  <script>
+    // Smooth scroll untuk tombol hero
+    document.querySelector('.hero-cta').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('#form-section').scrollIntoView({ behavior: 'smooth' });
+    });
+    
+  </script>
+
+</body>
+</html>
