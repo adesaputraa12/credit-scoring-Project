@@ -3,7 +3,7 @@ from pathlib import Path
 from src.mlProject.components.data_preprocessing import DataPreprocessing
 from src.mlProject.config.configuration import ConfigurationManager
 
-STAGE_NAME = "Data Transformation Stage"
+STAGE_NAME = "Data Preprocessing Stage"
 
 class DataPreprocessingPipeline:
     def __init__(self):

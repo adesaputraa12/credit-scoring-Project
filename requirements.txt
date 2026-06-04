@@ -1,31 +1,18 @@
-pandas
-numpy
+numpy==1.24.4
+pandas==1.5.3
 scikit-learn
 matplotlib
 seaborn
-
-# Notebook
-notebook
-
-# Data validation / config utils
+joblib
+scipy==1.10.1
+statsmodels
+scorecardpy==0.1.9.7
 python-box==6.0.2
 pyYAML
 types-PyYAML
 ensure==1.0.2
-
-# Model persistence
-joblib
-
-# Web app
-Flask
-Flask-Cors
-
-# Credit Scoring (WOE & Scorecard)
-scorecardpy
-optbinning
+flask
+flask-Cors
 category-encoders
-
-# Optional: statistik tambahan
-scipy
-statsmodels
+notebook
 -e .

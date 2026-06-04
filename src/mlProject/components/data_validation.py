@@ -11,7 +11,7 @@ class DataValidation:
         try:
             validation_status = None
 
-            data = pd.read_csv(self.config.data_path)
+            data = pd.read_csv(self.config.data_path, low_memory=False)
             all_cols = list(data.columns)
             all_schema = self.config.all_schema.keys()
 

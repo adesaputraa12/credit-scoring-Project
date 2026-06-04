@@ -3,8 +3,7 @@ from src.mlProject.utils.common import read_yaml, create_directories
 from mlProject.entity.config_entity import (DataIngestionConfig,
                                             DataValidationConfig,
                                             DataPreprocessingConfig,
-                                            ModelTrainerConfig,
-                                            ModelEvaluationConfig)
+                                            )
 
 class ConfigurationManager:
     def __init__(

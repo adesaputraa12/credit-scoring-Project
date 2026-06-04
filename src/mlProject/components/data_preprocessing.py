@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import scorecardpy as sc
 import joblib
+from pathlib import Path
 
 from src.mlProject.constants import (
     DROP_COLUMNS,
@@ -9,7 +10,7 @@ from src.mlProject.constants import (
     INTEGER_COLUMNS,
     TARGET_COLUMN,
 )
-from src.mlProject.entity.config_entity import DataPreprocessingArtifact, DataPreprocessingConfig
+from src.mlProject.entity.config_entity import DataPreprocessingConfig
 from src.mlProject.utils.common import (
     clean_numeric_series,
     convert_credit_history_to_months,
@@ -18,7 +19,6 @@ from src.mlProject.utils.common import (
     save_dataframe,
 )
 from src.mlProject.logging import logger
-from pathlib import Path
 
 
 class DataPreprocessing:
@@ -27,7 +27,11 @@ class DataPreprocessing:
 
     def _standardize_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
-        df.columns = [col.strip() for col in df.columns]
+        df.columns = (
+            df.columns.astype(str)
+            .str.strip()
+            .str.replace(r"\s+", "_", regex=True)
+        )
         return df
 
     def _drop_columns(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -76,13 +80,30 @@ class DataPreprocessing:
 
     def _map_target(self, df: pd.DataFrame) -> pd.DataFrame:
         if TARGET_COLUMN in df.columns:
-            target_map = {"Poor": 1, "Standard": 0, "Good": 0}
-            df[TARGET_COLUMN] = (
-                df[TARGET_COLUMN]
-                .astype(str).str.strip()
-                .map(target_map)
-                .fillna(0).astype(int)
-            )
+            target_map = {
+                "Poor": 1,
+                "Standard": 0,
+                "Good": 0,
+            }
+
+            # Kalau sudah numerik, biarkan; kalau belum, map dari string
+            if not pd.api.types.is_numeric_dtype(df[TARGET_COLUMN]):
+                df[TARGET_COLUMN] = (
+                    df[TARGET_COLUMN]
+                    .astype(str)
+                    .str.strip()
+                    .map(target_map)
+                )
+
+                if df[TARGET_COLUMN].isna().all():
+                    raise ValueError(
+                        f"TARGET_COLUMN '{TARGET_COLUMN}' tidak cocok dengan nilai target di data"
+                    )
+
+                df[TARGET_COLUMN] = df[TARGET_COLUMN].fillna(0)
+
+            df[TARGET_COLUMN] = pd.to_numeric(df[TARGET_COLUMN], errors="coerce").fillna(0).astype(int)
+
         return df
 
     def _final_numeric_cast(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -93,7 +114,7 @@ class DataPreprocessing:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce").astype(float)
         if TARGET_COLUMN in df.columns:
-            df[TARGET_COLUMN] = df[TARGET_COLUMN].astype(int)
+            df[TARGET_COLUMN] = pd.to_numeric(df[TARGET_COLUMN], errors="coerce").fillna(0).astype(int)
         return df
 
     def _preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -107,39 +128,70 @@ class DataPreprocessing:
         df = self._final_numeric_cast(df)
         return df
 
-    def initiate_data_preprocessing(self) -> DataPreprocessingArtifact:
-        # 1. Baca data mentah
+    def _ensure_target_exists(self, part: pd.DataFrame, source: pd.DataFrame) -> pd.DataFrame:
+        """
+        Kadang scorecardpy split_df mengembalikan dataframe yang targetnya tidak ikut terbawa
+        di versi tertentu / kondisi tertentu. Kalau itu terjadi, kita re-attach dari source
+        berdasarkan index.
+        """
+        if TARGET_COLUMN not in part.columns:
+            if part.index.isin(source.index).all():
+                part = part.copy()
+                part[TARGET_COLUMN] = source.loc[part.index, TARGET_COLUMN].values
+            else:
+                raise ValueError(
+                    f"TARGET_COLUMN '{TARGET_COLUMN}' tidak ditemukan setelah split. "
+                    f"Kolom yang tersedia: {part.columns.tolist()}"
+                )
+        return part
+
+    def initiate_data_preprocessing(self):
         df = pd.read_csv(self.config.data_path, low_memory=False)
         logger.info(f"Raw data loaded: {df.shape}")
 
-        # 2. Preprocess dulu sebelum split
         df = self._preprocess(df)
         logger.info(f"Preprocessing done: {df.shape}")
 
-        # 3. Split pakai scorecardpy
+        if TARGET_COLUMN not in df.columns:
+            raise ValueError(
+                f"TARGET_COLUMN '{TARGET_COLUMN}' tidak ditemukan pada dataframe hasil preprocess. "
+                f"Kolom tersedia: {df.columns.tolist()}"
+            )
+
         split = sc.split_df(df, y=TARGET_COLUMN, ratio=0.7, seed=42)
-        train, test = split['train'], split['test']
+        train, test = split["train"], split["test"]
+
+        train = self._ensure_target_exists(train, df)
+        test = self._ensure_target_exists(test, df)
+
         logger.info(f"Train: {train.shape}, Test: {test.shape}")
 
-        # 4. WoE binning dari train
+        if TARGET_COLUMN not in train.columns:
+            raise ValueError(
+                f"TARGET_COLUMN '{TARGET_COLUMN}' tetap tidak ada di train. "
+                f"Kolom train: {train.columns.tolist()}"
+            )
+
+        if train[TARGET_COLUMN].isna().all():
+            raise ValueError("Target kosong setelah preprocessing")
+
         bins = sc.woebin(train, y=TARGET_COLUMN)
         logger.info("WoE binning done")
 
-        # 5. Apply WoE ke train dan test
         train_woe = sc.woebin_ply(train, bins)
         test_woe = sc.woebin_ply(test, bins)
+
         logger.info("WoE transformation applied")
 
-        # 6. Save outputs
         save_dataframe(train_woe, self.config.processed_train_path)
         save_dataframe(test_woe, self.config.processed_test_path)
 
-        # Save bins untuk dipakai di scoring/prediction
         bins_path = Path(self.config.root_dir) / "woe_bins.pkl"
         joblib.dump(bins, bins_path)
+
         logger.info(f"WoE bins saved at {bins_path}")
 
-        return DataPreprocessingArtifact(
-            processed_train_path=str(self.config.processed_train_path),
-            processed_test_path=str(self.config.processed_test_path),
-        )
+        return {
+            "processed_train_path": str(self.config.processed_train_path),
+            "processed_test_path": str(self.config.processed_test_path),
+        }
