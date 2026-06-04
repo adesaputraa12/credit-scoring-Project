@@ -7,6 +7,10 @@ import joblib
 from box import ConfigBox
 from pathlib import Path
 from typing import Any
+import re
+from pathlib import Path
+import numpy as np
+import pandas as pd
 
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
     """reads yaml file and returns
@@ -104,3 +108,60 @@ def get_size(path: Path) -> str:
     """
     size_in_kb = round(os.path.getsize(path) / 1024, 2)
     return f"{size_in_kb} KB"
+
+def read_csv_file(file_path: Path) -> pd.DataFrame:
+    return pd.read_csv(file_path)
+
+
+def save_dataframe(df: pd.DataFrame, file_path: Path) -> None:
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(file_path, index=False)
+
+
+def clean_numeric_series(series: pd.Series) -> pd.Series:
+    if pd.api.types.is_numeric_dtype(series):
+        return series
+
+    cleaned = (
+        series.astype("string")
+        .str.replace(r"[^0-9.\-]", "", regex=True)
+        .replace({"": np.nan, "<NA>": np.nan, "nan": np.nan, "None": np.nan})
+    )
+    return pd.to_numeric(cleaned, errors="coerce")
+
+
+def convert_credit_history_to_months(series: pd.Series) -> pd.Series:
+    if pd.api.types.is_numeric_dtype(series):
+        return series
+
+    def _convert(value):
+        if pd.isna(value):
+            return np.nan
+
+        numbers = re.findall(r"\d+", str(value))
+        if len(numbers) >= 2:
+            years = int(numbers[0])
+            months = int(numbers[1])
+            return years * 12 + months
+        if len(numbers) == 1:
+            return int(numbers[0]) * 12
+        return np.nan
+
+    return series.apply(_convert)
+
+
+def fill_missing_numeric(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    for col in columns:
+        if col in df.columns:
+            df[col] = df[col].fillna(df[col].median())
+    return df
+
+
+def fill_missing_categorical(df: pd.DataFrame, columns: list[str], fill_value: str = "Missing") -> pd.DataFrame:
+    for col in columns:
+        if col in df.columns:
+            s = df[col].astype("string").str.strip()
+            s = s.replace(r"^_+$", np.nan, regex=True)
+            s = s.replace({"<NA>": np.nan, "nan": np.nan, "None": np.nan, "": np.nan})
+            df[col] = s.fillna(fill_value)
+    return df

@@ -2,7 +2,7 @@ from src.mlProject.constants import *
 from src.mlProject.utils.common import read_yaml, create_directories   
 from mlProject.entity.config_entity import (DataIngestionConfig,
                                             DataValidationConfig,
-                                            DataTransformationConfig,
+                                            DataPreprocessingConfig,
                                             ModelTrainerConfig,
                                             ModelEvaluationConfig)
 
@@ -21,73 +21,32 @@ class ConfigurationManager:
 
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         config = self.config.data_ingestion
-        
         create_directories([config.root_dir])
-
-        data_ingestion_config = DataIngestionConfig(
+    
+        return DataIngestionConfig(
             root_dir=config.root_dir,
             local_data_path=config.local_data_path,
-            local_data_file=config.local_data_file,
-            unzip_dir=config.unzip_dir
         )
-        return data_ingestion_config
     
     def get_data_validation_config(self) -> DataValidationConfig:
         config = self.config.data_validation
-
         create_directories([config.root_dir])
 
-        data_validation_config = DataValidationConfig(
+        return DataValidationConfig(
             root_dir=config.root_dir,
             STATUS_FILE=config.report_file,
-            unzip_dir=config.unzip_dir,
+            data_path=config.data_path,  # ← tambah ini
             all_schema=self.schema.COLUMNS
         )
-        return data_validation_config
     
-    def get_data_transformation_config(self) -> DataTransformationConfig:
-        config = self.config.data_transformation
+    def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
+        config = self.config.data_preprocessing
+        preprocessing_dir = Path(self.config.artifacts_root) / "data_preprocessing"
+        preprocessing_dir.mkdir(parents=True, exist_ok=True)
 
-        create_directories([config.root_dir])
-
-        data_transformation_config = DataTransformationConfig(
-            root_dir=config.root_dir,
-            data_path=config.data_path
+        return DataPreprocessingConfig(
+            root_dir=preprocessing_dir,
+            data_path=Path(config.data_path),
+            processed_train_path=preprocessing_dir / "train.csv",
+            processed_test_path=preprocessing_dir / "test.csv",
         )
-        return data_transformation_config
-    
-    def get_model_trainer_config(self) -> ModelTrainerConfig:
-        config = self.config.model_trainer
-        params = self.params.ElasticNet
-        schema = self.schema.TARGET_COLUMN
-
-        create_directories([config.root_dir])
-
-        model_trainer_config = ModelTrainerConfig(
-            root_dir = config.root_dir,
-            train_data_path = config.train_data_path,
-            test_data_path = config.test_data_path,
-            model_name = config.model_name,
-            alpha = params.alpha,
-            l1_ratio = params.l1_ratio,
-            target_column = schema.name
-        )
-        return model_trainer_config
-    
-    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
-        config = self.config.model_evaluation
-        params = self.params.ElasticNet
-        schema = self.schema.TARGET_COLUMN
-
-        create_directories([config.root_dir])
-
-        model_evaluation_config = ModelEvaluationConfig(
-            root_dir=Path(config.root_dir),
-            test_data_path=Path(config.test_data_path),
-            model_path=Path(config.model_path),
-            all_params=params,
-            metrics_file_path=Path(config.metrics_file_path),
-            target_column=schema.name
-        )
-        return model_evaluation_config
-    

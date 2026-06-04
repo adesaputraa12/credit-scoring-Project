@@ -4,37 +4,18 @@ from pathlib import Path
 @dataclass(frozen=True)
 class DataIngestionConfig:
     root_dir: Path
-    local_data_path: Path  # ← ganti jadi ini
-    local_data_file: Path
-    unzip_dir: Path
+    local_data_path: Path
 
 @dataclass(frozen=True)
 class DataValidationConfig:
     root_dir: Path
     STATUS_FILE: str
-    unzip_dir: Path
+    data_path: Path  # ← tambah ini
     all_schema: dict
 
 @dataclass(frozen=True)
-class DataTransformationConfig:
+class DataPreprocessingConfig:
     root_dir: Path
     data_path: Path
-
-@dataclass(frozen=True)
-class ModelTrainerConfig:
-     root_dir: Path
-     train_data_path: Path
-     test_data_path: Path
-     model_name: str
-     alpha: float
-     l1_ratio: float
-     target_column: str
-
-@dataclass(frozen=True)
-class ModelEvaluationConfig:
-    root_dir: Path
-    test_data_path: Path
-    model_path: Path
-    all_params: dict
-    metrics_file_path: Path
-    target_column: str
+    processed_train_path: Path
+    processed_test_path: Path

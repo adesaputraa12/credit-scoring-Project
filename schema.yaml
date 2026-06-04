@@ -1,16 +1,32 @@
 COLUMNS:
-  fixed acidity: float64
-  volatile acidity: float64
-  citric acid: float64
-  residual sugar: float64
-  chlorides: float64
-  free sulfur dioxide: float64
-  total sulfur dioxide: float64
-  density: float64
-  pH: float64
-  sulphates: float64
-  alcohol: float64
-  quality: int64
+  ID: object
+  Customer_ID: object
+  Month: object
+  Name: object
+  Age: object
+  SSN: object
+  Occupation: object
+  Annual_Income: object
+  Monthly_Inhand_Salary: float64
+  Num_Bank_Accounts: int64
+  Num_Credit_Card: int64
+  Interest_Rate: int64
+  Num_of_Loan: object
+  Type_of_Loan: object
+  Delay_from_due_date: int64
+  Num_of_Delayed_Payment: object
+  Changed_Credit_Limit: object
+  Num_Credit_Inquiries: float64
+  Credit_Mix: object
+  Outstanding_Debt: object
+  Credit_Utilization_Ratio: float64
+  Credit_History_Age: object
+  Payment_of_Min_Amount: object
+  Total_EMI_per_month: float64
+  Amount_invested_monthly: object
+  Payment_Behaviour: object
+  Monthly_Balance: object
+  Credit_Score: object
 
 TARGET_COLUMN:
-  name: quality
+  name: Credit_Score

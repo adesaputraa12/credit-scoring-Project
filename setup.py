@@ -4,9 +4,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
-__VERSION__ = "0.0.0"
+__VERSION__ = "0.0.1"
 
-REPO_NAME = "End-to-end-ML-Project-Implementation"
+REPO_NAME = "score-credit-prediction-Project"
 AUTHOR_USER_NAME = "Adesaputraa"
 SRC_REPO = "mlProject"
 AUTHOR_EMAIL = "adesaputraa121203@gmail.com"
