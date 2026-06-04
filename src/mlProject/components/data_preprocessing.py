@@ -174,6 +174,11 @@ class DataPreprocessing:
 
         if train[TARGET_COLUMN].isna().all():
             raise ValueError("Target kosong setelah preprocessing")
+        
+        train = sc.var_filter(train, y=TARGET_COLUMN, iv_limit=0.02)
+        keep_cols = [c for c in train.columns if c in test.columns]
+        test = test[keep_cols]
+        logger.info(f"Setelah filter IV: {train.shape}")
 
         bins = sc.woebin(train, y=TARGET_COLUMN)
         logger.info("WoE binning done")
