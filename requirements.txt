@@ -1,13 +1,30 @@
 pandas
-notebook
 numpy
 scikit-learn
 matplotlib
+
+# Notebook
+notebook
+
+# Data validation / config utils
 python-box==6.0.2
 pyYAML
-ensure==1.0.2
-joblib
 types-PyYAML
+ensure==1.0.2
+
+# Model persistence
+joblib
+
+# Web app
 Flask
 Flask-Cors
+
+# Credit Scoring (WOE & Scorecard)
+scorecardpy
+optbinning
+category-encoders
+
+# Optional: statistik tambahan
+scipy
+statsmodels
 -e .
