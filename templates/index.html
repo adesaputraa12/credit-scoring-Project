@@ -3,594 +3,549 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wine Quality Prediction</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-
+  <title>Credit Score Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    
-    :root {
-      --blue-dark:   #1A3C6E;   /* navbar & footer */
-      --blue-mid:    #2563EB;   /* tombol & aksen */
-      --blue-light:  #EEF4FF;   /* background section form */
-      --white:       #FFFFFF;
-      --text-dark:   #0F172A;
-      --text-mid:    #475569;
-      --text-light:  #94A3B8;
-      --border:      #CBD5E1;
-      --radius:      12px;
-      --shadow:      0 4px 24px rgba(37,99,235,0.08);
-    }
-
-    /* =============================================
-       RESET & BASE
-       ============================================= */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+    :root {
+      --bg:        #0a0e1a;
+      --surface:   #111827;
+      --surface2:  #1a2235;
+      --border:    #1e2d45;
+      --accent:    #00c2ff;
+      --accent2:   #7c3aed;
+      --good:      #10b981;
+      --bad:       #ef4444;
+      --warn:      #f59e0b;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --radius:    12px;
+    }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text-dark);
-      background: var(--white);
-      line-height: 1.6;
-    }
-
-    /* =============================================
-       NAVBAR — ubah teks menu di sini
-       ============================================= */
-    nav {
-      background: var(--blue-dark);
-      padding: 0 5%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 60px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-
-    .nav-logo {
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Sora', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--white);
-      text-decoration: none;
-      letter-spacing: -0.3px;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .nav-links {
-      display: flex;
-      gap: 28px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: rgba(255,255,255,0.75);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active { color: var(--white); }
-
-    /* =============================================
-       HERO SECTION — ubah judul & subtitle di sini
-       ============================================= */
-    .hero {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, #1e4fa8 60%, #2563EB 100%);
-      color: var(--white);
-      text-align: center;
-      padding: 88px 5% 96px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Dekorasi lingkaran samar di background hero */
-    .hero::before,
-    .hero::after {
+    /* ── Background ─────────────────────────────────── */
+    body::before {
       content: '';
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-    }
-    .hero::before { width: 400px; height: 400px; top: -120px; left: -100px; }
-    .hero::after  { width: 300px; height: 300px; bottom: -80px; right: -60px; }
-
-    .hero-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.9);
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      border-radius: 100px;
-      margin-bottom: 24px;
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0,194,255,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 80%, rgba(124,58,237,.08) 0%, transparent 60%);
+      pointer-events: none;
     }
 
-    .hero h1 {
-      font-family: 'Sora', sans-serif;
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -1px;
-      margin-bottom: 16px;
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      position: relative; z-index: 1;
+      padding: 28px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(12px);
+      background: rgba(17,24,39,.7);
     }
 
-    .hero p {
-      font-size: 1.05rem;
-      color: rgba(255,255,255,0.72);
-      max-width: 460px;
-      margin: 0 auto 36px;
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .logo-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .logo-text { font-size: 18px; font-weight: 600; letter-spacing: -.3px; }
+    .logo-sub  { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+
+    .header-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--accent);
+      padding: 5px 12px; border: 1px solid rgba(0,194,255,.2);
+      border-radius: 20px; background: rgba(0,194,255,.05);
     }
 
-    /* Tombol scroll ke form */
-    .hero-cta {
-      display: inline-block;
-      background: var(--white);
-      color: var(--blue-mid);
-      font-weight: 700;
-      font-size: 0.9rem;
-      padding: 13px 32px;
-      border-radius: 100px;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    /* ── Main layout ─────────────────────────────────── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 24px 80px;
     }
 
-    .hero-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    .page-title {
+      text-align: center; margin-bottom: 40px;
+    }
+    .page-title h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700; letter-spacing: -.5px;
+      color: var(--text);
+    }
+    .page-title p {
+      color: var(--muted); font-size: 14px; margin-top: 8px;
     }
 
-    /* =============================================
-       FORM SECTION
-       ============================================= */
-    .form-section {
-      background: var(--blue-light);
-      padding: 72px 5%;
+    /* ── Card ────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
     }
 
-    .form-container {
-      max-width: 860px;
-      margin: 0 auto;
-      background: var(--white);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      padding: 48px 48px 52px;
-    }
-
-    .form-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .form-header h2 {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: var(--blue-dark);
-      margin-bottom: 8px;
-    }
-
-    /* Garis dekorasi di bawah judul form */
-    .form-header h2::after {
-      content: '';
-      display: block;
-      width: 48px;
-      height: 3px;
-      background: var(--blue-mid);
-      margin: 10px auto 0;
-      border-radius: 2px;
-    }
-
-    .form-header p {
-      color: var(--text-mid);
-      font-size: 0.93rem;
-    }
-
-    /* =============================================
-       GRID FORM — 2 kolom desktop, 1 kolom mobile
-       ============================================= */
+    /* ── Form grid ───────────────────────────────────── */
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 28px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .form-grid.cols-3 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    label {
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      letter-spacing: .5px; text-transform: uppercase;
     }
 
-    /* Field label */
-    .field label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 7px;
-      letter-spacing: 0.2px;
-    }
-
-    /* Input styling */
-    .field input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.93rem;
-      color: var(--text-dark);
-      background: #F8FAFC;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      padding: 10px 14px;
       outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+      appearance: none;
     }
-
-    .field input::placeholder { color: var(--text-light); }
-
-    .field input:focus {
-      border-color: var(--blue-mid);
-      background: var(--white);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,194,255,.1);
     }
+    input::placeholder { color: var(--muted); }
 
-    /* Hint teks di bawah input */
-    .field .hint {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      margin-top: 5px;
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
     }
+    select option { background: var(--surface); }
 
-    /* =============================================
-       TOMBOL PREDICT — ubah teks di sini
-       ============================================= */
-    .btn-wrap {
-      text-align: center;
-      margin-top: 36px;
-    }
+    /* ── Submit btn ──────────────────────────────────── */
+    .btn-wrap { text-align: center; margin-top: 32px; }
 
     .btn-predict {
-      background: var(--blue-mid);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 14px 52px;
-      border: none;
-      border-radius: 100px;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(37,99,235,0.3);
-    }
-
-    .btn-predict:hover {
-      background: #1D4ED8;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(37,99,235,0.35);
-    }
-
-    .btn-predict:active { transform: translateY(0); }
-
-    /* =============================================
-       RESULT BOX — muncul setelah prediksi
-       (Jinja2: tampilkan jika ada {{ prediction }})
-       ============================================= */
-    .result-box {
-      margin-top: 28px;
-      background: #EEF4FF;
-      border: 1.5px solid #BFDBFE;
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      text-align: center;
-    }
-
-    .result-box .result-label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--blue-mid);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-
-    .result-box .result-value {
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 10px;
+      color: #fff; cursor: pointer;
       font-family: 'Sora', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--blue-dark);
+      font-size: 15px; font-weight: 600;
+      padding: 14px 48px;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(0,194,255,.25);
+    }
+    .btn-predict:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,194,255,.35); }
+    .btn-predict:active { transform: translateY(0); }
+    .btn-predict:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .btn-predict .spinner {
+      display: none; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-right: 8px; vertical-align: middle;
+    }
+    .btn-predict.loading .spinner { display: inline-block; }
+    .btn-predict.loading .btn-text { opacity: .7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Result panel ────────────────────────────────── */
+    #result-panel {
+      display: none;
+      animation: fadeUp .4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* =============================================
-       FOOTER — ubah nama & sosial di sini
-       ============================================= */
-    footer {
-      background: var(--blue-dark);
-      color: rgba(255,255,255,0.5);
-      text-align: center;
-      padding: 32px 5%;
+    .result-header {
+      display: flex; align-items: center; gap: 20px;
+      flex-wrap: wrap;
     }
 
-    .footer-icons {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 14px;
+    .verdict {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .verdict-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .verdict-icon.good { background: rgba(16,185,129,.15); }
+    .verdict-icon.bad  { background: rgba(239, 68, 68,.15); }
+
+    .verdict-label { font-size: 22px; font-weight: 700; }
+    .verdict-label.good { color: var(--good); }
+    .verdict-label.bad  { color: var(--bad); }
+    .verdict-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .result-stats {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-left: auto;
+    }
+    .stat-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 20px;
+      text-align: center; min-width: 100px;
+    }
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px; font-weight: 500;
+    }
+    .stat-val.good  { color: var(--good); }
+    .stat-val.bad   { color: var(--bad); }
+    .stat-val.score { color: var(--accent); }
+    .stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
+
+    /* ── Prob bar ────────────────────────────────────── */
+    .prob-section { margin-top: 24px; }
+    .prob-label-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--muted); margin-bottom: 8px;
+    }
+    .prob-bar-track {
+      height: 8px; border-radius: 4px;
+      background: var(--surface2); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .prob-bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width .8s cubic-bezier(.4,0,.2,1);
+    }
+    .prob-bar-fill.good { background: linear-gradient(90deg, var(--good), #34d399); }
+    .prob-bar-fill.bad  { background: linear-gradient(90deg, var(--bad),  #f87171); }
+
+    /* ── Error toast ─────────────────────────────────── */
+    #error-toast {
+      display: none;
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 10px; padding: 14px 18px;
+      color: #fca5a5; font-size: 13px;
+      margin-top: 16px;
     }
 
-    /* Icon SVG sosial media */
-    .footer-icons a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 50%;
-      color: var(--white);
-      transition: background 0.2s, transform 0.2s;
-    }
+    /* ── Divider ─────────────────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
 
-    .footer-icons a:hover {
-      background: var(--blue-mid);
-      transform: translateY(-2px);
-    }
-
-    .footer-icons svg { width: 18px; height: 18px; fill: currentColor; }
-
-    footer p { font-size: 0.82rem; }
-    footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
-    footer a:hover { color: var(--white); }
-
-    /* =============================================
-       RESPONSIVE — 1 kolom di layar kecil
-       ============================================= */
-    @media (max-width: 640px) {
-      .form-container { padding: 32px 24px 36px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }  /* sembunyikan menu di mobile */
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 600px) {
+      header { padding: 18px 20px; }
+      main   { padding: 24px 16px 60px; }
+      .card  { padding: 20px; }
+      .result-stats { margin-left: 0; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ============================================
-       NAVBAR
-       ============================================ -->
-  <nav>
-    <a href="/" class="nav-logo">🍷 WinePredict</a>
-    <ul class="nav-links">
-      <li><a href="/" class="active">Home</a></li>
-      <li><a href="#form-section">Predict</a></li>
-    </ul>
-  </nav>
+<header>
+  <div class="logo">
+    <div class="logo-icon">💳</div>
+    <div>
+      <div class="logo-text">CreditScore AI</div>
+      <div class="logo-sub">ML-powered · WOE Scorecard</div>
+    </div>
+  </div>
+  <div class="header-badge">v1.0 · LogReg + WOE</div>
+</header>
 
+<main>
+  <div class="page-title">
+    <h1>Credit Score Analyzer</h1>
+    <p>Masukkan data nasabah untuk memprediksi kelayakan kredit secara instan</p>
+  </div>
 
-  <section class="hero">
-    <div class="hero-badge">Machine Learning App</div>
-    <h1>Wine Quality<br>Prediction</h1>
-    <p>A Wine Quality Checking Web App — masukkan data kimia wine dan dapatkan prediksi kualitasnya secara instan.</p>
-    <a href="#form-section" class="hero-cta">Mulai Prediksi →</a>
-  </section>
+  <!-- ── FORM ───────────────────────────────────────── -->
+  <form id="predict-form">
 
+    <!-- Personal -->
+    <div class="card">
+      <div class="card-title">👤 Data Pribadi</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Umur</label>
+          <input type="number" name="Age" placeholder="Contoh: 32" min="18" max="100" required/>
+        </div>
 
-  <section class="form-section" id="form-section">
-    <div class="form-container">
-
-      <div class="form-header">
-        <h2>Please Fill The Information</h2>
-        <p>Isi semua kolom dengan nilai kimia wine yang ingin diprediksi</p>
+        <div class="field">
+          <label>Credit History Age (bulan)</label>
+          <input type="number" name="Credit_History_Age" placeholder="Contoh: 240" min="0"/>
+        </div>
       </div>
+    </div>
 
-      <form action="/predict" method="POST" id="predForm">
-        <div class="form-grid">
-
-          <!-- Kolom kiri -->
-          <div class="field">
-            <label for="fixed_acidity">Fixed Acidity</label>
-            <input
-              type="number" step="any"
-              id="fixed_acidity"
-              name="fixed_acidity"
-              placeholder="contoh: 7.4"
-              required
-            />
-            <span class="hint">Keasaman tetap (g/dm³)</span>
-          </div>
-
-          <!-- Kolom kanan -->
-          <div class="field">
-            <label for="volatile_acidity">Volatile Acidity</label>
-            <input
-              type="number" step="any"
-              id="volatile_acidity"
-              name="volatile_acidity"
-              placeholder="contoh: 0.70"
-              required
-            />
-            <span class="hint">Keasaman volatil (g/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="citric_acid">Citric Acid</label>
-            <input
-              type="number" step="any"
-              id="citric_acid"
-              name="citric_acid"
-              placeholder="contoh: 0.00"
-              required
-            />
-            <span class="hint">Asam sitrat (g/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="residual_sugar">Residual Sugar</label>
-            <input
-              type="number" step="any"
-              id="residual_sugar"
-              name="residual_sugar"
-              placeholder="contoh: 1.9"
-              required
-            />
-            <span class="hint">Sisa gula (g/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="chlorides">Chlorides</label>
-            <input
-              type="number" step="any"
-              id="chlorides"
-              name="chlorides"
-              placeholder="contoh: 0.076"
-              required
-            />
-            <span class="hint">Kadar klorida (g/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="free_sulfur_dioxide">Free Sulfur Dioxide</label>
-            <input
-              type="number" step="any"
-              id="free_sulfur_dioxide"
-              name="free_sulfur_dioxide"
-              placeholder="contoh: 11.0"
-              required
-            />
-            <span class="hint">SO₂ bebas (mg/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="total_sulfur_dioxide">Total Sulfur Dioxide</label>
-            <input
-              type="number" step="any"
-              id="total_sulfur_dioxide"
-              name="total_sulfur_dioxide"
-              placeholder="contoh: 34.0"
-              required
-            />
-            <span class="hint">Total SO₂ (mg/dm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="density">Density</label>
-            <input
-              type="number" step="any"
-              id="density"
-              name="density"
-              placeholder="contoh: 0.9978"
-              required
-            />
-            <span class="hint">Kepadatan (g/cm³)</span>
-          </div>
-
-          <div class="field">
-            <label for="pH">pH</label>
-            <input
-              type="number" step="any"
-              id="pH"
-              name="pH"
-              placeholder="contoh: 3.51"
-              required
-            />
-            <span class="hint">Tingkat keasaman (0–14)</span>
-          </div>
-
-          <div class="field">
-            <label for="sulphates">Sulphates</label>
-            <input
-              type="number" step="any"
-              id="sulphates"
-              name="sulphates"
-              placeholder="contoh: 0.56"
-              required
-            />
-            <span class="hint">Sulfat (g/dm³)</span>
-          </div>
-
-          <!-- Alcohol: lebar penuh di mobile, tetap di grid -->
-          <div class="field" style="grid-column: 1 / -1; max-width: calc(50% - 14px);">
-            <label for="alcohol">Alcohol</label>
-            <input
-              type="number" step="any"
-              id="alcohol"
-              name="alcohol"
-              placeholder="contoh: 9.4"
-              required
-            />
-            <span class="hint">Kadar alkohol (%)</span>
-          </div>
-
-        </div><!-- /form-grid -->
-
-        <!-- Tombol Predict -->
-        <div class="btn-wrap">
-          <button type="submit" class="btn-predict">
-            🔍 Predict Quality
-          </button>
+    <!-- Financial -->
+    <div class="card">
+      <div class="card-title">💰 Data Keuangan</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Annual Income</label>
+          <input type="number" name="Annual_Income" placeholder="Contoh: 60000" min="0"/>
+        </div>
+        <div class="field">
+          <label>Monthly Inhand Salary</label>
+          <input type="number" name="Monthly_Inhand_Salary" placeholder="Contoh: 4500" min="0"/>
         </div>
 
-        <!--
-          RESULT BOX (Flask/Jinja2):
-          Uncomment blok di bawah dan ganti dengan:
-          {% if prediction is defined %}
-            <div class="result-box">
-              <div class="result-label">Predicted Wine Quality</div>
-              <div class="result-value">{{ prediction }}</div>
-            </div>
-          {% endif %}
-
-          Untuk demo statis, hapus style="display:none" di bawah:
-        -->
-
-        {% if prediction is defined %}
-        <div class="result-box">
-          <div class="result-label">Predicted Wine Quality</div>
-          <div class="result-value">{{ prediction }} / 10</div>
+        <div class="field">
+          <label>Amount Invested Monthly</label>
+          <input type="number" name="Amount_invested_monthly" placeholder="Contoh: 200" min="0"/>
         </div>
-        {% endif %}
-
-      </form>
+        <div class="field">
+          <label>Outstanding Debt</label>
+          <input type="number" name="Outstanding_Debt" placeholder="Contoh: 1500" min="0"/>
+        </div>
+        <div class="field">
+          <label>Total EMI per Month</label>
+          <input type="number" name="Total_EMI_per_month" placeholder="Contoh: 400" min="0"/>
+        </div>
+      </div>
     </div>
-  </section>
 
+    <!-- Credit Profile -->
+    <div class="card">
+      <div class="card-title">🏦 Profil Kredit</div>
+      <div class="form-grid cols-3">
+        <div class="field">
+          <label>Jumlah Rekening Bank</label>
+          <input type="number" name="Num_Bank_Accounts" placeholder="Contoh: 3" min="0"/>
+        </div>
+        <div class="field">
+          <label>Jumlah Kartu Kredit</label>
+          <input type="number" name="Num_Credit_Card" placeholder="Contoh: 4" min="0"/>
+        </div>
+        <div class="field">
+          <label>Interest Rate (%)</label>
+          <input type="number" name="Interest_Rate" placeholder="Contoh: 15" min="0" max="100"/>
+        </div>
+        <div class="field">
+          <label>Jumlah Pinjaman</label>
+          <input type="number" name="Num_of_Loan" placeholder="Contoh: 2" min="0"/>
+        </div>
+        <div class="field">
+          <label>Credit Mix</label>
+          <select name="Credit_Mix">
+            <option value="">-- Pilih --</option>
+            <option>Good</option>
+            <option>Standard</option>
+            <option>Bad</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Changed Credit Limit</label>
+          <input type="number" name="Changed_Credit_Limit" placeholder="Contoh: 5" step="0.01"/>
+        </div>
 
-  <!-- ============================================
-       FOOTER — ubah nama & link sosmed di sini
-       ============================================ -->
-  <footer>
-    <div class="footer-icons">
-      <!-- LinkedIn -->
-      <a href="#" title="LinkedIn" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.44-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.22 0z"/></svg>
-      </a>
-      <!-- YouTube -->
-      <a href="#" title="YouTube" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.81zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z"/></svg>
-      </a>
-      <!-- GitHub -->
-      <a href="#" title="GitHub" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.01 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/></svg>
-      </a>
+        <div class="field">
+          <label>Num Credit Inquiries</label>
+          <input type="number" name="Num_Credit_Inquiries" placeholder="Contoh: 2" min="0"/>
+        </div>
+      </div>
     </div>
-    <p>© Wine Quality Prediction &nbsp;·&nbsp; <a href="#">ML Project Series</a></p>
-  </footer>
 
+    <!-- Payment -->
+    <div class="card">
+      <div class="card-title">📋 Perilaku Pembayaran</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Delay from Due Date (hari)</label>
+          <input type="number" name="Delay_from_due_date" placeholder="Contoh: 5" min="0"/>
+        </div>
+        <div class="field">
+          <label>Num of Delayed Payment</label>
+          <input type="number" name="Num_of_Delayed_Payment" placeholder="Contoh: 3" min="0"/>
+        </div>
+        <div class="field">
+          <label>Payment of Min Amount</label>
+          <select name="Payment_of_Min_Amount">
+            <option value="">-- Pilih --</option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>NM</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Payment Behaviour</label>
+          <select name="Payment_Behaviour">
+            <option value="">-- Pilih --</option>
+            <option>High_spent_Large_value_payments</option>
+            <option>High_spent_Medium_value_payments</option>
+            <option>High_spent_Small_value_payments</option>
+            <option>Low_spent_Large_value_payments</option>
+            <option>Low_spent_Medium_value_payments</option>
+            <option>Low_spent_Small_value_payments</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  <!-- ============================================
-       JAVASCRIPT — hanya untuk smooth scroll
-       & demo result box (hapus jika pakai Flask)
-       ============================================ -->
-  <script>
-    // Smooth scroll untuk tombol hero
-    document.querySelector('.hero-cta').addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelector('#form-section').scrollIntoView({ behavior: 'smooth' });
-    });
-    
-  </script>
+    <div class="btn-wrap">
+      <button type="submit" class="btn-predict" id="submit-btn">
+        <span class="spinner"></span>
+        <span class="btn-text">Analisis Kredit</span>
+      </button>
+    </div>
+
+    <div id="error-toast"></div>
+  </form>
+
+  <!-- ── RESULT ──────────────────────────────────────── -->
+  <div id="result-panel" class="card" style="margin-top:24px;">
+    <div class="card-title">📊 Hasil Prediksi</div>
+
+    <div class="result-header">
+      <div class="verdict">
+        <div class="verdict-icon" id="res-icon"></div>
+        <div>
+          <div class="verdict-label" id="res-label"></div>
+          <div class="verdict-sub"  id="res-sub"></div>
+        </div>
+      </div>
+      <div class="result-stats">
+        <div class="stat-box">
+          <div class="stat-val" id="res-prob-bad"></div>
+          <div class="stat-lbl">Prob. Poor</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="res-prob-good"></div>
+          <div class="stat-lbl">Prob. Good</div>
+        </div>
+        <div class="stat-box" id="score-box" style="display:none;">
+          <div class="stat-val score" id="res-score"></div>
+          <div class="stat-lbl">Credit Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prob-section">
+      <div class="prob-label-row">
+        <span>Good / Standard</span>
+        <span id="prob-bar-pct"></span>
+      </div>
+      <div class="prob-bar-track">
+        <div class="prob-bar-fill" id="prob-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const form    = document.getElementById('predict-form');
+  const btn     = document.getElementById('submit-btn');
+  const panel   = document.getElementById('result-panel');
+  const errBox  = document.getElementById('error-toast');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.style.display = 'none';
+    panel.style.display  = 'none';
+
+    // Collect form data
+    const raw = Object.fromEntries(new FormData(form));
+    const payload = {};
+    for (const [k, v] of Object.entries(raw)) {
+      if (v === '' || v === null) continue;
+      const num = Number(v);
+      payload[k] = isNaN(num) ? v : num;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    btn.classList.add('loading');
+    btn.querySelector('.btn-text').textContent = 'Menganalisis...';
+
+    try {
+      const res  = await fetch('/predict', {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.status !== 'success') throw new Error(data.message || 'Prediksi gagal');
+
+      renderResult(data);
+    } catch (err) {
+      errBox.style.display = 'block';
+      errBox.textContent   = '⚠ ' + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      btn.querySelector('.btn-text').textContent = 'Analisis Kredit';
+    }
+  });
+
+  function renderResult(data) {
+    const isGood  = data.prediction === 0;
+    const probGood = data.probability.good;
+    const probBad  = data.probability.bad;
+
+    // Icon & label
+    document.getElementById('res-icon').textContent   = isGood ? '✅' : '❌';
+    document.getElementById('res-icon').className     = 'verdict-icon ' + (isGood ? 'good' : 'bad');
+    document.getElementById('res-label').textContent  = data.label;
+    document.getElementById('res-label').className    = 'verdict-label ' + (isGood ? 'good' : 'bad');
+    document.getElementById('res-sub').textContent    = isGood
+      ? 'Nasabah memenuhi kriteria kredit'
+      : 'Nasabah berisiko tinggi — kredit ditolak';
+
+    // Stats
+    const badEl  = document.getElementById('res-prob-bad');
+    const goodEl = document.getElementById('res-prob-good');
+    badEl.textContent  = (probBad  * 100).toFixed(1) + '%';
+    goodEl.textContent = (probGood * 100).toFixed(1) + '%';
+    badEl.className    = 'stat-val ' + (isGood ? '' : 'bad');
+    goodEl.className   = 'stat-val ' + (isGood ? 'good' : '');
+
+    // Credit score
+    if (data.credit_score !== null && data.credit_score !== undefined) {
+      document.getElementById('score-box').style.display = 'block';
+      document.getElementById('res-score').textContent   = data.credit_score;
+    }
+
+    // Prob bar
+    const barPct = (probGood * 100).toFixed(1);
+    document.getElementById('prob-bar-pct').textContent    = barPct + '%';
+    const fill = document.getElementById('prob-bar-fill');
+    fill.className = 'prob-bar-fill ' + (isGood ? 'good' : 'bad');
+    setTimeout(() => fill.style.width = barPct + '%', 50);
+
+    // Show panel
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
 
 </body>
 </html>
