@@ -122,7 +122,7 @@ class ModelEvaluation:
                 show_plot=False,
             )
             psi_val = float(psi_result["psi"]["PSI"].iloc[0])
-            status = "Stabil ✅" if psi_val < 0.1 else "Perhatian ⚠" if psi_val < 0.25 else "Tidak Stabil ❌"
+            status = "Normal ✅" if psi_val < 0.1 else "Perhatian ⚠" if psi_val < 0.25 else "Don't Normal ❌"
             logger.info(f"PSI = {psi_val:.4f} → {status}")
             return psi_val
         except Exception as e:

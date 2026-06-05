@@ -86,7 +86,6 @@ class DataPreprocessing:
                 "Good": 0,
             }
 
-            # Kalau sudah numerik, biarkan; kalau belum, map dari string
             if not pd.api.types.is_numeric_dtype(df[TARGET_COLUMN]):
                 df[TARGET_COLUMN] = (
                     df[TARGET_COLUMN]

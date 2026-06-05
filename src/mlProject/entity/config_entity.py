@@ -19,8 +19,8 @@ class DataPreprocessingConfig:
     data_path: Path
     processed_train_path: Path
     processed_test_path: Path
-    train_raw_path: Path   # ← tambah
-    test_raw_path: Path    # ← tambah
+    train_raw_path: Path
+    test_raw_path: Path
 
 @dataclass(frozen=True)
 class ModelTrainerConfig:
@@ -40,8 +40,8 @@ class ModelEvaluationConfig:
     root_dir: Path
     train_data_path: Path
     test_data_path: Path
-    train_raw_path: Path        # ← tambah
-    test_raw_path: Path         # ← tambah
+    train_raw_path: Path
+    test_raw_path: Path
     model_path: Path
     woe_bins_path: Path
     scorecard_path: Path
