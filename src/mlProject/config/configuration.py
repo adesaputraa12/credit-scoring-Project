@@ -1,8 +1,10 @@
+from logging import config
+
 from src.mlProject.constants import *
 from src.mlProject.utils.common import read_yaml, create_directories   
 from mlProject.entity.config_entity import (DataIngestionConfig,
                                             DataValidationConfig,
-                                            DataPreprocessingConfig,
+                                            DataPreprocessingConfig, ModelTrainerConfig,
                                             )
 
 class ConfigurationManager:
@@ -48,4 +50,23 @@ class ConfigurationManager:
             data_path=Path(config.data_path),
             processed_train_path=preprocessing_dir / "train.csv",
             processed_test_path=preprocessing_dir / "test.csv",
+        )
+    
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        config = self.config.model_trainer
+        params = self.params.LogisticRegression
+
+        create_directories([config.root_dir])
+
+        return ModelTrainerConfig(
+            root_dir=config.root_dir,
+            train_data_path=config.train_data_path,
+            test_data_path=config.test_data_path,
+            woe_bins_path=config.woe_bins_path,
+            model_name=config.model_name,
+            C=params.C,
+            max_iter=params.max_iter,
+            solver=params.solver,
+            class_weight=params.class_weight,
+            target_column=self.schema.TARGET_COLUMN
         )
