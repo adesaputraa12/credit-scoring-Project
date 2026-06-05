@@ -2,8 +2,10 @@ import joblib
 import json
 import numpy as np
 import pandas as pd
+import scorecardpy as sc                                    # ← tambah
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score                  # ← tambah
 
 from src.mlProject.entity.config_entity import ModelTrainerConfig
 from src.mlProject.constants import TARGET_COLUMN
@@ -16,8 +18,9 @@ class ModelTrainer:
 
     def _load_data(self):
         train = pd.read_csv(self.config.train_data_path)
-        logger.info(f"Train: {train.shape}")
-        return train
+        test  = pd.read_csv(self.config.test_data_path)    # ← tambah test
+        logger.info(f"Train: {train.shape} | Test: {test.shape}")
+        return train, test
 
     def _check_class_distribution(self, y: pd.Series, label: str):
         dist = y.value_counts(normalize=True).round(4) * 100
@@ -44,7 +47,7 @@ class ModelTrainer:
         return coef_df
 
     def initiate_model_training(self):
-        train = self._load_data()
+        train, test = self._load_data()                    # ← unpack test juga
 
         if TARGET_COLUMN not in train.columns:
             raise ValueError(f"TARGET '{TARGET_COLUMN}' tidak ada di train")
@@ -53,6 +56,7 @@ class ModelTrainer:
 
         feature_cols = [c for c in train.columns if c != TARGET_COLUMN]
         X_train, y_train = train[feature_cols], train[TARGET_COLUMN]
+        X_test,  y_test  = test[feature_cols],  test[TARGET_COLUMN]  # ← tambah
 
         logger.info(f"WOE features: {len(feature_cols)}")
         self._check_class_distribution(y_train, "train")
@@ -68,6 +72,11 @@ class ModelTrainer:
         model.fit(X_train, y_train)
         logger.info(f"Training selesai ✅ iterasi={model.n_iter_[0]}")
 
+        # Quick AUC log
+        auc_train = roc_auc_score(y_train, model.predict_proba(X_train)[:, 1])
+        auc_test  = roc_auc_score(y_test,  model.predict_proba(X_test)[:, 1])
+        logger.info(f"AUC Train={auc_train:.4f} | AUC Test={auc_test:.4f} | Gap={auc_train-auc_test:.4f}")
+
         coef_df = self._log_coefficients(model, feature_cols)
 
         root = Path(self.config.root_dir)
@@ -81,8 +90,20 @@ class ModelTrainer:
 
         coef_df.to_csv(root / "coefficients.csv", index=False)
 
+        # ── Buat & simpan scorecard ──────────────────────────────────────────
+        try:
+            bins = joblib.load(self.config.woe_bins_path)
+            card = sc.scorecard(bins, model, feature_cols)
+            joblib.dump(card, root / "scorecard.pkl")
+            logger.info(f"Scorecard: {root / 'scorecard.pkl'}")
+        except Exception as e:
+            logger.info(f"Scorecard tidak dapat dibuat: {e}")
+        # ────────────────────────────────────────────────────────────────────
+
         return {
             "model_path": str(root / self.config.model_name),
             "n_features": len(feature_cols),
-            "n_iter": int(model.n_iter_[0]),
+            "n_iter":     int(model.n_iter_[0]),
+            "auc_train":  round(float(auc_train), 4),
+            "auc_test":   round(float(auc_test),  4),
         }

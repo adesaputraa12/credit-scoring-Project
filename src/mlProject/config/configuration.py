@@ -4,7 +4,9 @@ from src.mlProject.constants import *
 from src.mlProject.utils.common import read_yaml, create_directories   
 from mlProject.entity.config_entity import (DataIngestionConfig,
                                             DataValidationConfig,
-                                            DataPreprocessingConfig, ModelTrainerConfig,
+                                            DataPreprocessingConfig, 
+                                            ModelTrainerConfig,
+                                            ModelEvaluationConfig,
                                             )
 
 class ConfigurationManager:
@@ -50,6 +52,8 @@ class ConfigurationManager:
             data_path=Path(config.data_path),
             processed_train_path=preprocessing_dir / "train.csv",
             processed_test_path=preprocessing_dir / "test.csv",
+            train_raw_path=preprocessing_dir / "train_raw.csv",  # ← tambah
+            test_raw_path=preprocessing_dir / "test_raw.csv",    # ← tambah
         )
     
     def get_model_trainer_config(self) -> ModelTrainerConfig:
@@ -70,3 +74,25 @@ class ConfigurationManager:
             class_weight=params.class_weight,
             target_column=self.schema.TARGET_COLUMN
         )
+    
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        config = self.config.model_evaluation
+        params = self.params.LogisticRegression
+
+        create_directories([config.root_dir])
+
+        return ModelEvaluationConfig(
+            root_dir=Path(config.root_dir),
+            train_data_path=Path(config.train_data_path),
+            test_data_path=Path(config.test_data_path),
+            train_raw_path=Path("artifacts/data_preprocessing/train_raw.csv"),  # ← tambah
+            test_raw_path=Path("artifacts/data_preprocessing/test_raw.csv"),    # ← tambah
+            model_path=Path(config.model_path),
+            feature_names_path=Path(config.feature_names_path),
+            woe_bins_path=Path(config.woe_bins_path),
+            scorecard_path=Path(config.scorecard_path),
+            metrics_file_path=Path(config.metrics_file_path),
+            all_params=dict(params),
+            target_column=self.schema.TARGET_COLUMN,
+        )
+    

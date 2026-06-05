@@ -183,6 +183,12 @@ class DataPreprocessing:
         bins = sc.woebin(train, y=TARGET_COLUMN)
         logger.info("WoE binning done")
 
+        save_dataframe(train, self.config.train_raw_path)
+        save_dataframe(test, self.config.test_raw_path)
+
+        train_woe = sc.woebin_ply(train, bins)
+        test_woe = sc.woebin_ply(test, bins)
+
         train_woe = sc.woebin_ply(train, bins)
         test_woe = sc.woebin_ply(test, bins)
 
